@@ -1,0 +1,10 @@
+{
+  "name": "advisor-portal-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/advisor-portal-e2e/src",
+  "tags": ["scope:advisor-portal", "type:e2e"],
+  "implicitDependencies": ["advisor-portal"],
+  "// targets": "to see all targets run: nx show project advisor-portal-e2e --web",
+  "targets": {}
+}

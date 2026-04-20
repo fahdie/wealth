@@ -1,0 +1,146 @@
+{
+  "name": "advisor-portal",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/advisor-portal/src",
+  "tags": ["scope:advisor-portal", "type:app"],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/advisor-portal/browser",
+        "index": "apps/advisor-portal/src/index.html",
+        "main": "apps/advisor-portal/src/main.ts",
+        "tsConfig": "apps/advisor-portal/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/advisor-portal/public"
+          }
+        ],
+        "styles": ["apps/advisor-portal/src/styles.css"]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "advisor-portal:build:production"
+        },
+        "development": {
+          "buildTarget": "advisor-portal:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "advisor-portal:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "advisor-portal:build",
+        "port": 4200,
+        "spa": true
+      }
+    },
+    "server": {
+      "dependsOn": ["build"],
+      "executor": "@angular-devkit/build-angular:server",
+      "options": {
+        "outputPath": "dist/apps/advisor-portal/server",
+        "main": "apps/advisor-portal/src/server.ts",
+        "tsConfig": "apps/advisor-portal/tsconfig.server.json"
+      },
+      "configurations": {
+        "production": {
+          "outputHashing": "media"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "sourceMap": true,
+          "extractLicenses": false,
+          "vendorChunk": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve-ssr": {
+      "continuous": true,
+      "executor": "@angular-devkit/build-angular:ssr-dev-server",
+      "configurations": {
+        "development": {
+          "browserTarget": "advisor-portal:build:development",
+          "serverTarget": "advisor-portal:server:development"
+        },
+        "production": {
+          "browserTarget": "advisor-portal:build:production",
+          "serverTarget": "advisor-portal:server:production"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/advisor-portal/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "prerender": {
+      "executor": "@angular-devkit/build-angular:prerender",
+      "options": {
+        "routes": ["/"]
+      },
+      "configurations": {
+        "development": {
+          "browserTarget": "advisor-portal:build:development",
+          "serverTarget": "advisor-portal:server:development"
+        },
+        "production": {
+          "browserTarget": "advisor-portal:build:production",
+          "serverTarget": "advisor-portal:server:production"
+        }
+      },
+      "defaultConfiguration": "production"
+    }
+  }
+}

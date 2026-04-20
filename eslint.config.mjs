@@ -25,16 +25,12 @@ export default [
               onlyDependOnLibsWithTags: ['scope:shared'],
             },
             {
-              sourceTag: 'scope:shop',
-              onlyDependOnLibsWithTags: ['scope:shop', 'scope:shared'],
+              sourceTag: 'scope:advisor-portal',
+              onlyDependOnLibsWithTags: ['scope:advisor-portal', 'scope:shared'],
             },
             {
-              sourceTag: 'scope:api',
-              onlyDependOnLibsWithTags: ['scope:api', 'scope:shared'],
-            },
-            {
-              sourceTag: 'type:data',
-              onlyDependOnLibsWithTags: ['type:data'],
+              sourceTag: 'scope:api-gateway',
+              onlyDependOnLibsWithTags: ['scope:api-gateway', 'scope:shared'],
             },
           ],
         },
