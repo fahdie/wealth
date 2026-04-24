@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@org/shared-dto": ["libs/shared-dto/src/index.ts"]
+      "@org/shared-dto": ["libs/shared-dto/src/index.ts"],
+      "@org/shared-mock-data": ["libs/shared-mock-data/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

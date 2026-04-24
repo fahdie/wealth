@@ -18,7 +18,7 @@ jest.mock('./app/app.module', () => ({
   AppModule: class MockAppModule {},
 }));
 
-const flushPromises = () => new Promise<void>((resolve) => setImmediate(resolve));
+const flushPromises = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 describe('api-gateway bootstrap', () => {
   const originalEnv = process.env;

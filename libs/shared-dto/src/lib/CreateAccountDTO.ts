@@ -19,4 +19,12 @@ export class CreateAccountDTO {
 
   @IsEmail()
   email: string;
+
+  constructor(formValue: any) {
+    this.accountNumber = formValue.accountNumber;
+    this.firstName = formValue.firstName;
+    this.lastName = formValue.lastName;
+    this.username = formValue.username;
+    this.email = formValue.email;
+  }
 }
