@@ -2,12 +2,14 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
-    "moduleResolution": "node10",
+    "module": "ES2022",
     "types": ["jest", "node"],
-    "isolatedModules": false
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
+    "setup-jest.ts",
     "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",

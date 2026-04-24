@@ -1,0 +1,94 @@
+<h1>Create Your Account</h1>
+
+@if (isLoading()) {
+  <div class="loading-indicator">
+    <span>Creating account...</span>
+  </div>
+}
+
+@if (errorMessage()) {
+  <div class="error-banner">
+    <p>{{ errorMessage() }}</p>
+    <button type="button" (click)="dismissError()">Dismiss</button>
+  </div>
+}
+
+@if (isSuccess()) {
+  <div class="success-banner">
+    <p>Account created successfully!</p>
+  </div>
+}
+
+<form [formGroup]="createAccountForm" (ngSubmit)="onSubmit()">
+  <div class="form-field">
+    <label for="accountNumber">Account Number</label>
+    <input
+      id="accountNumber"
+      type="number"
+      formControlName="accountNumber"
+      min="1"
+    />
+    @if (createAccountForm.get('accountNumber')?.invalid && createAccountForm.get('accountNumber')?.touched) {
+      <span class="error">Please enter a valid positive account number</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="firstName">First Name</label>
+    <input
+      id="firstName"
+      type="text"
+      formControlName="firstName"
+      maxlength="50"
+    />
+    @if (createAccountForm.get('firstName')?.invalid && createAccountForm.get('firstName')?.touched) {
+      <span class="error">First name is required (max 50 characters)</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="lastName">Last Name</label>
+    <input
+      id="lastName"
+      type="text"
+      formControlName="lastName"
+      maxlength="50"
+    />
+    @if (createAccountForm.get('lastName')?.invalid && createAccountForm.get('lastName')?.touched) {
+      <span class="error">Last name is required (max 50 characters)</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="username">Username</label>
+    <input
+      id="username"
+      type="text"
+      formControlName="username"
+      maxlength="30"
+    />
+    @if (createAccountForm.get('username')?.invalid && createAccountForm.get('username')?.touched) {
+      <span class="error">Username is required (max 30 characters)</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      formControlName="email"
+    />
+    @if (createAccountForm.get('email')?.invalid && createAccountForm.get('email')?.touched) {
+      <span class="error">Please enter a valid email address</span>
+    }
+  </div>
+
+  <button type="submit" [disabled]="createAccountForm.invalid || isLoading()">
+    @if (isLoading()) {
+      Creating...
+    } @else {
+      Create Account
+    }
+  </button>
+</form>

@@ -12,7 +12,7 @@ jest.mock('./app/app', () => ({
   App: class MockApp {},
 }));
 
-const flushPromises = () => new Promise<void>((resolve) => setImmediate(resolve));
+const flushPromises = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 describe('advisor-portal bootstrap', () => {
   beforeEach(() => {

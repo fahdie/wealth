@@ -18,3 +18,8 @@ export const selectAccountsError = createSelector(
   selectAccountsState,
   (state) => state.error
 );
+
+export const selectSelectedAccount = createSelector(
+  selectAccountsState,
+  (state) => state.selectedAccount
+);

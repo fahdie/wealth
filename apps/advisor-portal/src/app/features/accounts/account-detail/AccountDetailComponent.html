@@ -1,0 +1,62 @@
+@if (account) {
+  <div class="account-detail-card">
+    <div class="card-header">
+      <h3>{{ account.firstName }} {{ account.lastName }}</h3>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <div class="card-body">
+      <div class="detail-row">
+        <span class="label">Account ID:</span>
+        <span class="value">{{ account.accountId }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Account Number:</span>
+        <span class="value">{{ account.accountNumber }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Type:</span>
+        <span class="value">{{ account.accountType }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Status:</span>
+        <span class="value status-badge" [class]="getStatusClass(account.status)">
+          {{ account.status }}
+        </span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Balance:</span>
+        <span class="value">{{ account.balance | currency: account.currency }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Available:</span>
+        <span class="value">{{ account.availableBalance | currency: account.currency }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Email:</span>
+        <span class="value">{{ account.email }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Advisor:</span>
+        <span class="value">{{ account.advisorId }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Opened:</span>
+        <span class="value">{{ account.openedDate | date:'mediumDate' }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Last Activity:</span>
+        <span class="value">{{ account.lastActivityDate | date:'mediumDate' }}</span>
+      </div>
+    </div>
+  </div>
+}

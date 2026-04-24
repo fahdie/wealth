@@ -1,2 +1,11 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<header>
+  <h1>Wealth Platform - Advisor Portal</h1>
+  <nav>
+    <a routerLink="/accounts" routerLinkActive="active">Accounts</a>
+    <a routerLink="/accounts/create" routerLinkActive="active">Create Account</a>
+  </nav>
+</header>
+
+<main>
+  <router-outlet></router-outlet>
+</main>

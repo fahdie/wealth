@@ -1,0 +1,32 @@
+<h2>Accounts</h2>
+
+@if (error()) {
+  <div class="error-banner">
+    <p>{{ error() }}</p>
+    <button (click)="retryLoad()">Retry</button>
+  </div>
+}
+
+<div class="search-container">
+  <input 
+    type="text" 
+    [formControl]="searchControl" 
+    placeholder="Search by name, email, or account ID...">
+  @if (searchControl.value) {
+    <button class="clear-btn" (click)="clearSearch()">Clear</button>
+  }
+</div>
+
+<app-account-list
+  [accounts]="accounts()"
+  [loading]="loading()"
+  [selectedAccountId]="selectedAccount()?.accountId ?? null"
+  (accountSelected)="onAccountSelected($event)">
+</app-account-list>
+
+@if (selectedAccount()) {
+  <app-account-detail
+    [account]="selectedAccount()"
+    (close)="onCloseDetails()">
+  </app-account-detail>
+}

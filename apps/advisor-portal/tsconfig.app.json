@@ -4,7 +4,7 @@
     "outDir": "../../dist/out-tsc",
     "types": []
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/app/shared/validation.pipe"],
   "exclude": [
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
