@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangeDetectorRef } from '@angular/core';
 import { AccountListComponent } from './AccountListComponent';
 import { Account } from '@org/shared-mock-data';
 
 declare const jest: typeof import('@jest/globals').jest;
-
 
 describe('AccountListComponent', () => {
   let component: AccountListComponent;
@@ -61,9 +59,8 @@ describe('AccountListComponent', () => {
 
   describe('renders accounts correctly', () => {
     it('should display table rows for each account', () => {
-      component.accounts = mockAccounts;
-      component.loading = false;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', false);
       fixture.detectChanges();
 
       const rows = fixture.nativeElement.querySelectorAll('tbody tr');
@@ -71,101 +68,98 @@ describe('AccountListComponent', () => {
     });
 
     it('should display account data in table cells', () => {
-      component.accounts = mockAccounts;
-      component.loading = false;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', false);
       fixture.detectChanges();
 
       const firstRow = fixture.nativeElement.querySelector('tbody tr');
-      expect(firstRow.textContent).toContain('ACC-001');
-      expect(firstRow.textContent).toContain('Michael');
-      expect(firstRow.textContent).toContain('Chen');
-      expect(firstRow.textContent).toContain('BROKERAGE');
+      expect(firstRow?.textContent).toContain('ACC-001');
+      expect(firstRow?.textContent).toContain('Michael');
+      expect(firstRow?.textContent).toContain('Chen');
+      expect(firstRow?.textContent).toContain('BROKERAGE');
     });
   });
 
   describe('loading state', () => {
     it('should display loading indicator when loading is true', () => {
-      component.loading = true;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('loading', true);
       fixture.detectChanges();
 
       const loading = fixture.nativeElement.querySelector('.loading');
       expect(loading).toBeTruthy();
-      expect(loading.textContent).toContain('Loading accounts...');
+      expect(loading?.textContent).toContain('Loading accounts...');
     });
 
-    it('should hide table when loading is true', () => {
-      component.loading = true;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+    it('should hide table panel when loading is true', () => {
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', true);
       fixture.detectChanges();
 
-      const table = fixture.nativeElement.querySelector('table');
-      expect(table).toBeFalsy();
+      const panel = fixture.nativeElement.querySelector(
+        '.table-panel',
+      ) as HTMLElement;
+      expect(panel?.style.display).toBe('none');
     });
 
-    it('should show table when loading is false', () => {
-      component.loading = false;
-      component.accounts = mockAccounts;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+    it('should show table panel when loading is false', () => {
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', false);
       fixture.detectChanges();
 
-      const table = fixture.nativeElement.querySelector('table');
-      expect(table).toBeTruthy();
+      const panel = fixture.nativeElement.querySelector(
+        '.table-panel',
+      ) as HTMLElement;
+      expect(panel?.style.display).not.toBe('none');
     });
   });
 
   describe('empty state', () => {
     it('should display "No accounts found" when accounts array is empty', () => {
-      component.accounts = [];
-      component.loading = false;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('accounts', []);
+      fixture.componentRef.setInput('loading', false);
       fixture.detectChanges();
 
       const emptyMessage = fixture.nativeElement.querySelector('tbody tr td');
-      expect(emptyMessage.textContent).toContain('No accounts found');
+      expect(emptyMessage?.textContent).toContain('No accounts found');
     });
   });
 
   describe('selection event', () => {
     it('should emit accountSelected when row is clicked', () => {
-      component.accounts = mockAccounts;
-      component.loading = false;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', false);
       fixture.detectChanges();
 
       const emitSpy = jest.spyOn(component.accountSelected, 'emit');
 
       const firstRow = fixture.nativeElement.querySelector('tbody tr');
-      firstRow.click();
+      firstRow?.click();
 
       expect(emitSpy).toHaveBeenCalledTimes(1);
       expect(emitSpy).toHaveBeenCalledWith(mockAccounts[0]);
     });
 
     it('should emit correct account when second row is clicked', () => {
-      component.accounts = mockAccounts;
-      component.loading = false;
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', false);
       fixture.detectChanges();
 
       const emitSpy = jest.spyOn(component.accountSelected, 'emit');
 
       const rows = fixture.nativeElement.querySelectorAll('tbody tr');
-      rows[1].click();
+      rows[1]?.click();
 
       expect(emitSpy).toHaveBeenCalledWith(mockAccounts[1]);
     });
 
     it('should highlight selected row', () => {
-      component.accounts = mockAccounts;
-      component.loading = false;
-      component.selectedAccountId = 'ACC-001';
-      fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+      fixture.componentRef.setInput('accounts', mockAccounts);
+      fixture.componentRef.setInput('loading', false);
+      fixture.componentRef.setInput('selectedAccountId', 'ACC-001');
       fixture.detectChanges();
 
       const firstRow = fixture.nativeElement.querySelector('tbody tr');
-      expect(firstRow.classList.contains('selected')).toBe(true);
+      expect(firstRow?.classList.contains('selected')).toBe(true);
     });
   });
 });

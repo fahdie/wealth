@@ -1,8 +1,6 @@
-@if (loading) {
-  <div class="loading">Loading accounts...</div>
-}
+<div #loadingPanel class="loading">Loading accounts...</div>
 
-@if (!loading) {
+<div #tablePanel class="table-panel">
   <table>
     <thead>
       <tr>
@@ -14,21 +12,21 @@
       </tr>
     </thead>
     <tbody>
-      @for (account of accounts; track account.accountId) {
-        <tr 
-          [class.selected]="account.accountId === selectedAccountId"
+      @for (account of accounts(); track account.accountId) {
+        <tr
+          [class.selected]="account.accountId === selectedAccountId()"
           (click)="onRowClick(account)">
           <td>{{ account.accountId }}</td>
           <td>{{ account.firstName }} {{ account.lastName }}</td>
           <td>{{ account.accountType }}</td>
           <td>{{ account.balance | currency: account.currency }}</td>
-          <td>{{ account.accountNumber}}</td>
+          <td>{{ account.accountNumber }}</td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="4">No accounts found</td>
+          <td colspan="5">No accounts found</td>
         </tr>
       }
     </tbody>
   </table>
-}
+</div>

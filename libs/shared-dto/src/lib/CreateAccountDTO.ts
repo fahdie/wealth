@@ -1,6 +1,6 @@
 import { IsString, IsEmail, IsInt, IsPositive, MaxLength } from 'class-validator';
 
-export class CreateAccountDTO {
+export class  CreateAccountDTO {
   @IsInt()
   @IsPositive()
   accountNumber: number;

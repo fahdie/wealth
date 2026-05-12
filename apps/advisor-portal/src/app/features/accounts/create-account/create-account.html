@@ -39,7 +39,7 @@
       id="firstName"
       type="text"
       formControlName="firstName"
-      maxlength="50"
+      maxlength="50"  
     />
     @if (createAccountForm.get('firstName')?.invalid && createAccountForm.get('firstName')?.touched) {
       <span class="error">First name is required (max 50 characters)</span>

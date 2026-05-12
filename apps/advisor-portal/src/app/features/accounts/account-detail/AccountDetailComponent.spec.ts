@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangeDetectorRef } from '@angular/core';
 import { AccountDetailComponent } from './AccountDetailComponent';
 
 describe('AccountDetailComponent', () => {
@@ -21,7 +20,7 @@ describe('AccountDetailComponent', () => {
   });
 
   it('should display detail rows when account is set', () => {
-    component.account = {
+    fixture.componentRef.setInput('account', {
       accountId: 'ACC-001',
       accountNumber: 78432156,
       accountType: 'BROKERAGE',
@@ -31,22 +30,20 @@ describe('AccountDetailComponent', () => {
       username: 'mchen',
       email: 'michael.chen@email.com',
       advisorId: 'ADV-101',
-      balance: 245780.50,
-      availableBalance: 243500.00,
+      balance: 245780.5,
+      availableBalance: 243500.0,
       currency: 'USD',
       openedDate: '2021-03-15',
       lastActivityDate: '2024-01-18',
-    };
-
-    fixture.componentRef.injector.get(ChangeDetectorRef).markForCheck();
+    });
     fixture.detectChanges();
 
     const rows = fixture.nativeElement.querySelectorAll('.detail-row');
     expect(rows.length).toBe(10);
   });
 
-  it('should not display content when account is null', () => {
-    component.account = null;
+  it('should not display card when account is null', () => {
+    fixture.componentRef.setInput('account', null);
     fixture.detectChanges();
 
     const card = fixture.nativeElement.querySelector('.account-detail-card');

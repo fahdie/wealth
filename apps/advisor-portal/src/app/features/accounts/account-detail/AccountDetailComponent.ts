@@ -1,7 +1,14 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  ElementRef,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Account, AccountStatus } from '@org/shared-mock-data';
-
 
 @Component({
   selector: 'app-account-detail',
@@ -12,8 +19,23 @@ import { Account, AccountStatus } from '@org/shared-mock-data';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountDetailComponent {
-  @Input() account: Account | null = null;
-  @Output() close = new EventEmitter<void>();
+  account = input<Account | null>(null);
+  close = output<void>();
+
+  rootPanel = viewChild<ElementRef<HTMLElement>>('rootPanel');
+
+  constructor() {
+    effect(() => {
+      const acc = this.account();
+      this.rootPanel();
+
+      const root = this.rootPanel()?.nativeElement;
+      if (!root) {
+        return;
+      }
+      root.style.display = acc ? '' : 'none';
+    });
+  }
 
   onClose() {
     this.close.emit();
@@ -21,11 +43,16 @@ export class AccountDetailComponent {
 
   getStatusClass(status: AccountStatus | undefined): string {
     switch (status) {
-      case 'ACTIVE': return 'status-active';
-      case 'PENDING': return 'status-pending';
-      case 'SUSPENDED': return 'status-suspended';
-      case 'CLOSED': return 'status-closed';
-      default: return '';
+      case 'ACTIVE':
+        return 'status-active';
+      case 'PENDING':
+        return 'status-pending';
+      case 'SUSPENDED':
+        return 'status-suspended';
+      case 'CLOSED':
+        return 'status-closed';
+      default:
+        return '';
     }
   }
 }

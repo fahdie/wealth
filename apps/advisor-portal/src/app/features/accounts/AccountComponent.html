@@ -24,9 +24,7 @@
   (accountSelected)="onAccountSelected($event)">
 </app-account-list>
 
-@if (selectedAccount()) {
-  <app-account-detail
-    [account]="selectedAccount()"
-    (close)="onCloseDetails()">
-  </app-account-detail>
-}
+<app-account-detail
+  [account]="selectedAccount()"
+  (close)="onCloseDetails()">
+</app-account-detail>
