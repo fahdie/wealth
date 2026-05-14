@@ -17,9 +17,3 @@
   padding-top: 1.5rem;
   border-top: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
 }
-
-.user-details h2 {
-  margin: 0 0 1rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-}

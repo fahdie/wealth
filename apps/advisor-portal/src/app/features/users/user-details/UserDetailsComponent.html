@@ -1,4 +1,13 @@
 <div class="container">
+  <h2 class="user-details-title">User details</h2>
+
+  @if (selectedUser()) {
+    <aside class="derived" aria-label="Derived from selected user (signals)">
+      <p><strong>Address</strong>: {{ fullAddressSignal() }}</p>
+      <p><strong>Company</strong>: {{ companySummarySignal() }}</p>
+    </aside>
+  }
+
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
     <div>
       <label for="id">ID</label>
@@ -8,16 +17,25 @@
     <div>
       <label for="name">Name</label>
       <input id="name" type="text" formControlName="name" />
+      @if (userForm.controls.name.invalid && userForm.controls.name.touched) {
+        <span class="field-error" role="alert">Name is required.</span>
+      }
     </div>
 
     <div>
       <label for="username">User Name</label>
       <input id="username" type="text" formControlName="username" />
+      @if (userForm.controls.username.invalid && userForm.controls.username.touched) {
+        <span class="field-error" role="alert">Username is required.</span>
+      }
     </div>
 
     <div>
       <label for="email">Email</label>
       <input id="email" type="email" formControlName="email" />
+      @if (userForm.controls.email.invalid && userForm.controls.email.touched) {
+        <span class="field-error" role="alert">Enter a valid email.</span>
+      }
     </div>
 
     <button type="submit" [disabled]="userForm.invalid">Submit</button>

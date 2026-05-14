@@ -1,8 +1,13 @@
-import { Component, inject } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { UsersStore } from '../store/users.store';
 import { CommonModule } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
+import {
+  takeUntilDestroyed,
+  toObservable,
+} from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { UsersStore } from '../store/users.store';
+import { combineLatest, distinctUntilChanged, filter, map, tap } from 'rxjs';
 
 @Component({
   selector: 'app-user-details-component',
@@ -13,18 +18,51 @@ import { CommonModule } from '@angular/common';
 })
 export class UserDetailsComponent {
   readonly store = inject(UsersStore);
-  private fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
+
+  /** Deep signal chain: store → selected user → nested address / company. */
+  readonly selectedUser = computed(() => this.store.activeUser());
+  readonly addressSignal = computed(() => this.selectedUser()?.address ?? null);
+  readonly fullAddressSignal = computed(() => {
+    const a = this.addressSignal();
+    if (!a) {
+      return 'No address on file';
+    }
+    return [a.street, a.suite, a.city, a.zipcode].filter(Boolean).join(', ');
+  });
+  readonly companySummarySignal = computed(() => {
+    const c = this.selectedUser()?.company;
+    if (!c) {
+      return 'No company on file';
+    }
+    return `${c.name} — ${c.catchPhrase}`;
+  });
 
   readonly userForm = this.fb.group({
-    id: ['', Validators.required],
+    id: [{ value: '', disabled: true }],
     name: ['', Validators.required],
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
   });
 
   constructor() {
-    // Avoid `effect` + `patchValue`: updating reactive forms from an effect can
-    // conflict with Angular's signal write rules and leave the UI out of sync.
+    combineLatest([
+      this.route.paramMap.pipe(
+        map((p) => p.get('id')),
+        distinctUntilChanged()
+      ),
+      toObservable(this.store.users),
+    ])
+      .pipe(
+        takeUntilDestroyed(),
+        filter(
+          ([id, users]) => id != null && id !== '' && users.length > 0
+        ),
+        tap(([id]) => this.store.selectUser(id!))
+      )
+      .subscribe();
+
     toObservable(this.store.activeUser)
       .pipe(takeUntilDestroyed())
       .subscribe((user) => {

@@ -1,23 +1,25 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { User } from '../user.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { UserService } from '../services/users-api-service';
-import { computed, inject } from '@angular/core';
-import { catchError, of, pipe, switchMap, tap } from 'rxjs';
+import { inject } from '@angular/core';
+import { catchError, of, switchMap, tap } from 'rxjs';
 
 type UsersState = {
   users: User[];
   activeUser: User | null;
   isLoading: boolean;
   error: string | null;
+  /** After first successful fetch; avoids refetch on every navigation (which would wipe local edits). */
+  usersLoaded: boolean;
 };
-// Signal store state + selectors for list/loading/error/selected user.
 
 const initialState: UsersState = {
   users: [],
   activeUser: null,
   isLoading: false,
-  error: null
+  error: null,
+  usersLoaded: false,
 };
 
 export const UsersStore = signalStore(
@@ -25,25 +27,34 @@ export const UsersStore = signalStore(
 
   withState(initialState),
 
-  withComputed((store) => ({
-    list: computed(() => store.users()),
-    loading: computed(() => store.isLoading()),
-    error: computed(() => store.error()),
-    selectedUser: computed(() => store.activeUser()),
-  })),
-
   withMethods((store, userService = inject(UserService)) => ({
-    loadUsers() {
-      patchState(store, { isLoading: true, error: null });
-      userService.getUsers().subscribe({
-        next: (users) => patchState(store, { users, isLoading: false }),
-        error: (err) =>
-          patchState(store, {
-            error: err?.message ?? 'Failed to load users',
-            isLoading: false,
-          }),
-      });
-    },
+    /** Loads users; `switchMap` cancels an in-flight request when triggered again. */
+    loadUsers: rxMethod<void>((trigger$) =>
+      trigger$.pipe(
+        tap(() => patchState(store, { isLoading: true, error: null })),
+        switchMap(() =>
+          userService.getUsers().pipe(
+            tap({
+              next: (users) =>
+                patchState(store, {
+                  users,
+                  isLoading: false,
+                  error: null,
+                  usersLoaded: true,
+                }),
+            }),
+            catchError((err: unknown) => {
+              patchState(store, {
+                error:
+                  err instanceof Error ? err.message : 'Failed to load users',
+                isLoading: false,
+              });
+              return of(null);
+            })
+          )
+        )
+      )
+    ),
 
     selectUser(id: string) {
       const activeUser =
@@ -55,6 +66,10 @@ export const UsersStore = signalStore(
       });
     },
 
+    clearActiveUser() {
+      patchState(store, { activeUser: null, error: null });
+    },
+
     /** Persists name/username/email edits into the in-memory list (and active user). */
     updateUserInList(updates: Pick<User, 'name' | 'username' | 'email'>) {
       const current = store.activeUser();
@@ -64,9 +79,7 @@ export const UsersStore = signalStore(
 
       const id = String(current.id);
       const nextUsers = store.users().map((user) =>
-        String(user.id) === id
-          ? { ...user, ...updates }
-          : user
+        String(user.id) === id ? { ...user, ...updates } : user
       );
       const nextActive =
         nextUsers.find((user) => String(user.id) === id) ?? null;

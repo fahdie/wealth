@@ -29,36 +29,33 @@
 ### Goal
 
 - **Parent** (`UsersComponent`): loads users from the API, shows list + loading/error, **reactive filter form**, selects a user into the store.
-- **Child** (`UserDetailsComponent`): shows selected user with **reactive form**, **deep signals** (`computed` chains from selected user), and an **`effect`** to `patchValue` / reset the form when selection changes.
+- **Child** (`UserDetailsComponent`): shows selected user with **reactive form**, **deep signals** (`computed` chains from `selectedUser()`), and **`toObservable` + subscription** (or `effect`) to `patchValue` / reset the form when selection changes.
 - **State**: NgRx **signal store** owns `users`, `loading`, `error`, `selectedUserId` (or equivalent).
-
 ### Tasks
 
 1. **`User` model** — TypeScript interface for fields you display (minimum: `id`, `name`, `username`, `email`; optional nested `address`, `company`).
 2. **`UsersApiService`** — inject `HttpClient`; `getUsers(): Observable<User[]>` → `GET` the users URL above.
 3. **`UsersStore`** (signal store) — `loadUsers()`, `selectUser(id)`, selectors for list/loading/error/selected user.
 4. **`UsersComponent`** (standalone) — on init call `loadUsers()`; template binds to store signals; filter form drives filtered list (signals + form state).
-5. **`UserDetailsComponent`** (standalone) — reactive form with validators; multiple `computed` layers from `selectedUser()`; `effect` syncs store → form.
+5. **`UserDetailsComponent`** (standalone) — reactive form with validators; multiple `computed` layers from `selectedUser()`; observable bridge or `effect` syncs store → form.
 
 ### Acceptance criteria
 
 - [ ] No duplicate “source of truth”: list + selection live in the **signal store**.
 - [ ] Child demonstrates **deep** signal usage (nested / chained `computed`, not a single flat `computed`).
-- [ ] Child uses **`effect`** to sync selected user → **reactive form** (`patchValue` / reset).
+- [ ] Child syncs selected user → **reactive form** (`patchValue` / reset) via **`effect`** or **`toObservable` + `takeUntilDestroyed`** (document the tradeoff).
 - [ ] At least one **validator** on the child form (e.g. `Validators.required`, `Validators.email`).
 - [ ] Loading and error states are visible from the store.
 
 ### Completion — Prompt 1
 
-*(Fill after you finish Prompt 1.)*
-
-- **What was implemented**:
-- **Key files / paths**:
-- **Deviations / shortcuts taken**:
+- **What was implemented**: `UserService` maps API users to `User` (string `id`). `UsersStore` uses `rxMethod` + `switchMap` for loads (cancels stale requests). Redundant `withComputed` wrappers removed; state signals used directly. `UserDetailsComponent` adds chained `computed`s (`selectedUser` → `addressSignal` → `fullAddressSignal`, plus `companySummarySignal`), read-only `id` control, validation messages, and `toObservable(activeUser)` for form sync. Service spec renamed to `UserService` with HTTP mock + id normalization test.
+- **Key files / paths**: `apps/advisor-portal/src/app/features/users/services/users-api-service.ts`, `users-api-service.spec.ts`, `store/users.store.ts`, `user-details/UserDetailsComponent.ts` / `.html` / `.css`, `UsersComponent.*`, `user.model.ts`.
+- **Deviations / shortcuts taken**: Form sync uses **`toObservable` + subscribe** instead of `effect` (avoids signal/write interaction issues with `patchValue`); call this out in the interview.
 
 ### Talking point — Prompt 1
 
-*(Why this is efficient / interview-ready — one short paragraph.)*
+**Why this is efficient:** The store is the single source of truth for list, loading, errors, and selection. `rxMethod` with `switchMap` keeps async loading predictable under rapid retriggers. The child keeps **read-only derived UI** in layered `computed`s (cheap, synchronous updates) while using a small **Observable bridge** only for imperative form patching—clear separation between declarative signal graph and side-effectful form APIs. Normalizing `id` at the HTTP boundary removes repeated `String(id)` drift across the feature.
 
 ---
 
@@ -86,15 +83,15 @@
 
 ### Completion — Prompt 2
 
-*(Fill after you finish Prompt 2.)*
-
-- **What was implemented**:
+- **What was implemented**: Nested routes under `users`: parent lazy-loads `UsersComponent`, child `path: ':id'` lazy-loads `UserDetailsComponent`. List rows use `[routerLink]="['/users', user.id]"` with `routerLinkActive="selected"`. Parent template uses only `<router-outlet />` for detail (no embedded child). `UserDetailsComponent` uses `combineLatest(paramMap id, store.users)` then `selectUser` so deep links work after `loadUsers` completes. `clearActiveUser()` on store; parent clears selection when URL is `/users` with no child (initial + `NavigationEnd`). `RouterLinkActive` imported for active row styling.
 - **Route table (paths)**:
-- **Key files / paths**:
+  - `/users` — list only (empty detail outlet).
+  - `/users/:id` — list + detail for that id (e.g. `/users/3`).
+- **Key files / paths**: `app.routes.ts`, `UsersComponent.ts` / `.html` / `.css`, `user-details/UserDetailsComponent.ts`, `store/users.store.ts`.
 
 ### Talking point — Prompt 2
 
-*(Why lazy routes + URL-driven selection help scale and UX.)*
+**Why this helps:** URLs become bookmarkable and refresh-safe: `/users/7` rehydrates selection after data loads. Lazy `loadComponent` on both parent and child keeps initial bundles smaller. Row `routerLink` gives correct browser semantics (middle-click, open in new tab) versus click-only handlers. Clearing selection when the child route disappears keeps the list highlight aligned with the URL.
 
 ---
 
