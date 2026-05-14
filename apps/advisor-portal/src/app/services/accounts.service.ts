@@ -1,47 +1,45 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { Account, MOCK_ACCOUNTS } from '@org/shared-mock-data';
 import { CreateAccountDTO } from '@org/shared-dto';
-import { 
-  MOCK_ACCOUNTS, 
-  Account, 
-  shouldSimulateFailure 
-} from '@org/shared-mock-data';
 
-@Injectable({
-  providedIn: 'root',
-})
+/**
+ * Client-side accounts API backed by in-memory mock data until the gateway
+ * exposes `/api/accounts` in {@link AppModule}.
+ */
+@Injectable({ providedIn: 'root' })
 export class AccountsService {
-  private http = inject(HttpClient);
-  private accounts = [...MOCK_ACCOUNTS];
+  private accounts: Account[] = structuredClone(MOCK_ACCOUNTS);
 
   getAccounts(): Observable<Account[]> {
-    return of(this.accounts).pipe(
-      delay(500)
-    );
+    return of([...this.accounts]).pipe(delay(50));
   }
 
-  getAccountById(accountId: string): Observable<Account> {
-    const account = this.accounts.find(acc => acc.accountId === accountId);
-    
-    if (!account) {
-      return throwError(() => new Error(`Account ${accountId} not found`));
+  searchAccounts(query: string): Observable<Account[]> {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      return of([...this.accounts]).pipe(delay(50));
     }
-    
-    return of(account).pipe(delay(300));
+    return of(
+      this.accounts.filter(
+        (a) =>
+          a.firstName.toLowerCase().includes(q) ||
+          a.lastName.toLowerCase().includes(q) ||
+          a.email.toLowerCase().includes(q) ||
+          a.username.toLowerCase().includes(q) ||
+          String(a.accountNumber).includes(q) ||
+          a.accountId.toLowerCase().includes(q)
+      )
+    ).pipe(delay(50));
   }
 
   createAccount(dto: CreateAccountDTO): Observable<Account> {
-    if (shouldSimulateFailure(0.15)) {
-      return throwError(() => new Error('Failed to create account. Please try again.')).pipe(
-        delay(500)
-      );
-    }
-
-    const newAccount: Account = {
-      accountId: `ACC-${String(this.accounts.length + 1).padStart(3, '0')}`,
-      accountNumber: Math.floor(Math.random() * 90000000) + 10000000,
+    const nextIndex = this.accounts.length + 1;
+    const today = new Date().toISOString().split('T')[0];
+    const account: Account = {
+      accountId: `ACC-${String(nextIndex).padStart(3, '0')}`,
+      accountNumber: dto.accountNumber,
       accountType: 'BROKERAGE',
       status: 'PENDING',
       firstName: dto.firstName,
@@ -52,31 +50,10 @@ export class AccountsService {
       balance: 0,
       availableBalance: 0,
       currency: 'USD',
-      openedDate: new Date().toISOString().split('T')[0],
-      lastActivityDate: new Date().toISOString().split('T')[0],
+      openedDate: today,
+      lastActivityDate: today,
     };
-
-    // this.accounts.push(newAccount);
-
-    this.accounts = [...this.accounts, newAccount];
-    
-    return of(newAccount).pipe(delay(800));
-  }
-
-  searchAccounts(query: string): Observable<Account[]> {
-    const lowerQuery = query.toLowerCase().trim();
-    
-    if (!lowerQuery) {
-      return of(this.accounts).pipe(delay(300));
-    }
-
-    const filtered = this.accounts.filter(acc =>
-      acc.firstName.toLowerCase().includes(lowerQuery) ||
-      acc.lastName.toLowerCase().includes(lowerQuery) ||
-      acc.email.toLowerCase().includes(lowerQuery) ||
-      acc.accountId.toLowerCase().includes(lowerQuery)
-    );
-
-    return of(filtered).pipe(delay(400));
+    this.accounts = [...this.accounts, account];
+    return of(account).pipe(delay(50));
   }
 }

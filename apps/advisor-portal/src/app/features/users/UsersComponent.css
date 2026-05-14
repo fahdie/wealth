@@ -1,0 +1,25 @@
+.userList table tbody tr {
+  cursor: pointer;
+}
+
+.userList table tbody tr:hover {
+  background-color: color-mix(in srgb, CanvasText 6%, transparent);
+}
+
+.userList table tbody tr.selected {
+  background-color: color-mix(in srgb, CanvasText 10%, transparent);
+  outline: 2px solid color-mix(in srgb, CanvasText 25%, transparent);
+  outline-offset: -2px;
+}
+
+.user-details {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+}
+
+.user-details h2 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}

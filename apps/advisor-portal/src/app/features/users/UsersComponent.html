@@ -1,0 +1,64 @@
+<div class="container">
+    <div class="loading">
+        @if(this.usersStore.isLoading()){
+        <h2>Loading...</h2>
+        }
+
+    </div>
+    <div class="error">
+        @if(this.usersStore.error()){
+        {{this.usersStore.error()}}
+        }
+
+    </div>
+    <div class="userList">
+        <div class="filter">
+            <label for="user-filter">Filter users</label>
+            <input
+              id="user-filter"
+              type="text"
+              [formControl]="filterControl"
+              placeholder="Search by name, username, email, or ID"
+            >
+        </div>
+        <table>
+            <thead>
+              <tr>  
+                <th>ID</th>
+                <th>Name</th>
+                <th>User Name</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of filteredUsers(); track user.id) {
+                <tr
+                  role="button"
+                  tabindex="0"
+                  [class.selected]="isSelected(user)"
+                  (click)="onSelectUser(user)"
+                  (keydown.enter)="onSelectUser(user)"
+                  (keydown.space)="$event.preventDefault(); onSelectUser(user)"
+                >
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.email }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4">No users found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+        @if (this.usersStore.activeUser()) {
+          <section class="user-details" aria-label="Selected user details">
+            <h2>User details</h2>
+            <app-user-details-component />
+          </section>
+        }
+    </div>
+
+</div>
